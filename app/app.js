@@ -13,7 +13,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { ConnectedRouter } from 'connected-react-router';
-import FontFaceObserver from 'fontfaceobserver';
 import history from 'utils/history';
 import 'sanitize.css/sanitize.css';
 
@@ -24,22 +23,32 @@ import App from 'containers/App';
 import LanguageProvider from 'containers/LanguageProvider';
 
 // Load the favicon and the .htaccess file
-import '!file-loader?name=[name].[ext]!./images/favicon.ico';
-import 'file-loader?name=.htaccess!./.htaccess'; // eslint-disable-line import/extensions
+/* eslint-disable import/no-unresolved, import/extensions */
+// import '!file-loader?name=[name].[ext]!./images/favicon.ico';
+// import '!file-loader?name=[name].[ext]!./assets/css';
+// import '!!file?name=[name].[ext]!./bower_components/bootstrap/dist/css/bootstrap.min.css';
+
+import 'file-loader?name=.htaccess!./.htaccess';
+/* eslint-enable import/no-unresolved, import/extensions */
 
 import configureStore from './configureStore';
 
 // Import i18n messages
 import { translationMessages } from './i18n';
+import 'assets/vendor/bootstrap/css/bootstrap.min.css';
+import 'assets/css/style.css';
+import 'assets/css/responsive.css';
+import 'assets/css/mega.menu.css';
+import 'assets/css/owlslider.css';
+import 'assets/vendor/OwlCarousel/assets/owl.carousel.css';
+import 'assets/vendor/OwlCarousel/assets/owl.theme.default.min.css';
+import 'assets/vendor/fontawesome-free/css/all.min.css';
 
-// Observe loading of Open Sans (to remove open sans, remove the <link> tag in
-// the index.html file and this observer)
-const openSansObserver = new FontFaceObserver('Open Sans', {});
-
-// When Open Sans is loaded, add a font-family using Open Sans to the body
-openSansObserver.load().then(() => {
-  document.body.classList.add('fontLoaded');
-});
+// import 'assets/vendor/jquery/jquery.min.js';
+// import 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js';
+// import 'assets/vendor/jquery-easing/jquery.easing.min.js';
+// import 'assets/vendor/OwlCarousel/owl.carousel.js';
+// import 'assets/js/owlslider.js';
 
 // Create redux store with history
 const initialState = {};
@@ -74,12 +83,7 @@ if (!window.Intl) {
   new Promise(resolve => {
     resolve(import('intl'));
   })
-    .then(() =>
-      Promise.all([
-        import('intl/locale-data/jsonp/en.js'),
-        import('intl/locale-data/jsonp/de.js'),
-      ]),
-    ) // eslint-disable-line prettier/prettier
+    .then(() => Promise.all([import('intl/locale-data/jsonp/en.js')]))
     .then(() => render(translationMessages))
     .catch(err => {
       throw err;
