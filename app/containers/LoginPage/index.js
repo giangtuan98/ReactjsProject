@@ -5,7 +5,7 @@
  *
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Helmet } from 'react-helmet';
@@ -14,17 +14,62 @@ import { compose } from 'redux';
 
 import { useInjectSaga } from 'utils/injectSaga';
 import { useInjectReducer } from 'utils/injectReducer';
+import { Redirect } from 'react-router-dom';
+import { checkLoginAction } from './actions';
 import makeSelectLoginPage from './selectors';
 import reducer from './reducer';
 import saga from './saga';
 import TitleBar from '../../components/Shared/TitleBar';
 
-export function LoginPage() {
+// console.log(LoginActions);
+export function LoginPage({ checkLogin, loginPage }) {
+  const [auth, setAuth] = useState({ email: '', password: '' });
+  const [errors, setError] = useState({ email: '', password: '' });
+
+  const handleSubmit = e => {
+    e.preventDefault();
+    checkLogin(auth);
+  };
+
+  const handleInput = e => {
+    const targetName = e.target.name;
+    const targetValue = e.target.value;
+    setAuth({
+      ...auth,
+      [targetName]: e.target.value,
+    });
+    console.log(targetName);
+    if (
+      targetName === 'email' &&
+      !/^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/.test(targetValue)
+    ) {
+      // console.log(targetName);
+      setError({
+        ...errors,
+        [targetName]: `Email khong dung dinh dang`,
+      });
+      return;
+    }
+
+    if (!e.target.value) {
+      setError({
+        ...errors,
+        [targetName]: `Nhập hộ cái ${targetName}`,
+      });
+    } else {
+      setError({
+        ...errors,
+        [targetName]: '',
+      });
+    }
+  };
+
   useInjectReducer({ key: 'loginPage', reducer });
   useInjectSaga({ key: 'loginPage', saga });
 
   return (
     <div>
+      {loginPage.isAuthenticate && <Redirect to="/" />}
       <Helmet>
         <title>LoginPage</title>
         <meta name="description" content="Description of LoginPage" />
@@ -38,7 +83,7 @@ export function LoginPage() {
               <div className="login-container">
                 <div className="row">
                   <div className="col-lg-12 col-md-12 col-12">
-                    <form>
+                    <form onSubmit={handleSubmit}>
                       <div className="login-form">
                         <div className="login-logo">
                           <a href="index.html">
@@ -62,17 +107,45 @@ export function LoginPage() {
                           <input
                             type="text"
                             className="video-form"
-                            id="emailphonenumber"
-                            placeholder="Type Email or Phone Number"
+                            id="email"
+                            name="email"
+                            onChange={handleInput}
+                            placeholder="Type Email"
+                            autoComplete="off"
                           />
+                          {errors.email && (
+                            <p
+                              style={{
+                                color: 'red',
+                                textAlign: 'left',
+                                fontSize: '12px',
+                              }}
+                            >
+                              {errors.email}
+                            </p>
+                          )}
                         </div>
                         <div className="form-group">
                           <input
                             type="password"
                             className="video-form"
-                            id="yourPassword"
+                            id="password"
+                            name="password"
+                            onChange={handleInput}
                             placeholder="Password"
+                            autoComplete="off"
                           />
+                          {errors.password && (
+                            <p
+                              style={{
+                                color: 'red',
+                                textAlign: 'left',
+                                fontSize: '12px',
+                              }}
+                            >
+                              {errors.password}
+                            </p>
+                          )}
                         </div>
                         <button type="submit" className="login-btn btn-link">
                           Login Now
@@ -111,9 +184,16 @@ const mapStateToProps = createStructuredSelector({
 
 function mapDispatchToProps(dispatch) {
   return {
-    dispatch,
+    checkLogin: auth => dispatch(checkLoginAction(auth)),
   };
 }
+
+// const mapDispatchToProps = dispatch => ({
+//   fetchUser: () =>
+//     dispatch({
+//       type: 'USER_FETCH_REQUESTED',
+//     }),
+// });
 
 const withConnect = connect(
   mapStateToProps,

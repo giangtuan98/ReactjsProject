@@ -8,12 +8,13 @@
  */
 
 import React from 'react';
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, Redirect } from 'react-router-dom';
 
 import HomePage from 'containers/HomePage/Loadable';
 import NotFoundPage from 'containers/NotFoundPage/Loadable';
 import LoginPage from 'containers/LoginPage/Loadable';
 import ProductDetail from 'containers/ProductDetail/Loadable';
+
 import Header from '../../components/Shared/Header';
 import GlobalStyle from '../../global-styles';
 import Footer from '../../components/Shared/Footer';
